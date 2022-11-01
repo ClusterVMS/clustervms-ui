@@ -1,0 +1,18 @@
+
+
+
+// FIXME: find a better way to do this
+* {
+	width: 100%;
+}
+
+
+.video-grid {
+	display: grid;
+	grid-template-columns: auto auto auto;	// FIXME: adaptive format
+}
+
+
+* {
+	background-color: slategrey;
+}
