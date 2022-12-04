@@ -4,7 +4,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
 
-import { Camera } from './camera';
+import { Camera, CameraId } from './camera';
 
 
 
@@ -14,6 +14,14 @@ import { Camera } from './camera';
 export class CameraService {
 
 	constructor(private http: HttpClient) {}
+
+	getCamera(id: CameraId): Observable<Camera> {
+		return this.http.get<Camera>("http://clustervms.localdomain/v0/cameras/"+id)
+			.pipe(
+				tap(_ => console.log("fetched camera")),
+				catchError(this.handleError<Camera>('getCamera', undefined))
+			);
+	}
 
 	getCameras(): Observable<Camera[]> {
 		return this.http.get<Camera[]>("http://clustervms.localdomain/v0/cameras/")

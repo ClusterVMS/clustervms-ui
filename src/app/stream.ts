@@ -1,8 +1,14 @@
 
 
 
+export type StreamId = string;
+
+export type StreamMap = {
+	[key: StreamId]: Stream;
+};
+
 export interface Stream {
-	id: number;
+	id: StreamId;
 	source_url: string;
 	recast_url?: string;
 }

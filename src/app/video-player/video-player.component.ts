@@ -1,6 +1,9 @@
 import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
 import { Component, Input, AfterViewInit, ViewChild } from '@angular/core';
 
+import { Camera } from '../camera';
+import { CameraService } from '../camera.service';
+
 
 
 /**
@@ -14,17 +17,17 @@ import { Component, Input, AfterViewInit, ViewChild } from '@angular/core';
 })
 export class VideoPlayerComponent implements AfterViewInit {
 
-	@Input() cameraId?: number;
+	@Input() cameraId: string = "";
 
 	webrtc: any;
 	webrtcSendChannel: any;
 	webrtcSendChannelInterval: any;
 	video: any;
 	streamUrl: string = "";
-	streamId: number = 0;
+	streamId: string = "";
 
 	@ViewChild('video') videoDirective? : any;
-	constructor(private http: HttpClient) {}
+	constructor(private http: HttpClient, private cameraService: CameraService) {}
 
 	ngAfterViewInit(): void {
 		if(this.cameraId === undefined) {
@@ -47,8 +50,17 @@ export class VideoPlayerComponent implements AfterViewInit {
 		this.webrtcSendChannelInterval = null;
 		this.video = this.videoDirective.nativeElement;
 
-		this.http.get("http://clustervms.localdomain/v0/cameras/"+this.cameraId).subscribe((data: any) => {
-			this.streamUrl = data.streams[this.streamId].recast_url;
+		this.cameraService.getCamera(this.cameraId).subscribe((data: Camera) => {
+			if(data === undefined) {
+				return;
+			} else {
+				this.streamId = "1"; // TODO: determine proper stream to use
+				this.streamUrl = data.streams[this.streamId]?.recast_url ?? "";
+				if(this.streamUrl === "") {
+					console.error("Failed to retrieve URL for camera " + this.cameraId + " stream " + this.streamId);
+					return;
+				}
+			}
 
 			var _this = this;
 			this.webrtc = new RTCPeerConnection({

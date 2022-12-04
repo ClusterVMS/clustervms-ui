@@ -1,8 +1,11 @@
-import { Stream } from './stream';
+import { StreamMap } from './stream';
 
+
+
+export type CameraId = string;
 
 export interface Camera {
-	id: number;
+	id: CameraId;
 	name: string;
-	streams: Stream[];
+	streams: StreamMap;
 }
