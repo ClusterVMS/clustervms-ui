@@ -1,4 +1,4 @@
-FROM node:17.8-alpine3.15
+FROM node:18.12-alpine3.16
 WORKDIR /app/
 COPY ./package.json /app/
 COPY ./package-lock.json /app/
