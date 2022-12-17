@@ -1,8 +1,9 @@
 import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
-import { Component, Input, AfterViewInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, Input, AfterViewInit, ViewChild } from '@angular/core';
 
 import { Camera } from '../camera';
 import { CameraService } from '../camera.service';
+import { StreamId, StreamMap } from '../stream';
 
 
 
@@ -23,11 +24,13 @@ export class VideoPlayerComponent implements AfterViewInit {
 	webrtcSendChannel: any;
 	webrtcSendChannelInterval: any;
 	video: any;
+	aspectRatio = 16 / 9;
 	streamUrl: string = "";
 	streamId: string = "";
 
 	@ViewChild('video') videoDirective? : any;
-	constructor(private http: HttpClient, private cameraService: CameraService) {}
+
+	constructor(private http: HttpClient, private cameraService: CameraService, private el: ElementRef) {}
 
 	ngAfterViewInit(): void {
 		if(this.cameraId === undefined) {
@@ -44,6 +47,29 @@ export class VideoPlayerComponent implements AfterViewInit {
 		this.playWebrtc()
 	}
 
+	/// Determines the optimal stream to play, based on size and other characteristics
+	chooseStream(streams: StreamMap): StreamId {
+		let playerWidth = this.el.nativeElement.offsetWidth;
+
+		let bestStreamId = "";
+		for(let [streamId, streamInfo] of Object.entries(streams)) {
+			// Choose this stream if we haven't chosen any yet.
+			if(bestStreamId === "") {
+				bestStreamId = streamId;
+				continue;
+			}
+
+			// Choose the stream that's closest in size to our player
+			// Not sure what formula makes the most sense. Using simple difference for now, but there might be a better formula.
+			if(Math.abs(playerWidth - streams[bestStreamId].width) > Math.abs(playerWidth - streamInfo.width)) {
+				bestStreamId = streamId;
+				continue;
+			}
+		}
+
+		return bestStreamId;
+	}
+
 	playWebrtc() {
 		this.webrtc = null;
 		this.webrtcSendChannel = null;
@@ -54,7 +80,7 @@ export class VideoPlayerComponent implements AfterViewInit {
 			if(data === undefined) {
 				return;
 			} else {
-				this.streamId = "1"; // TODO: determine proper stream to use
+				this.streamId = this.chooseStream(data.streams);
 				this.streamUrl = data.streams[this.streamId]?.recast_url ?? "";
 				if(this.streamUrl === "") {
 					console.error("Failed to retrieve URL for camera " + this.cameraId + " stream " + this.streamId);

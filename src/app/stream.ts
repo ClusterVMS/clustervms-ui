@@ -11,4 +11,6 @@ export interface Stream {
 	id: StreamId;
 	source_url: string;
 	recast_url?: string;
+	width: number;
+	height: number;
 }

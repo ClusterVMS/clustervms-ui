@@ -1,1 +1,3 @@
-<video #video class="videoPlayer" vtype="webrtc" autoplay controls muted playsinline></video>
+<div class="video-wrapper" [ngStyle]="{'aspect-ratio': aspectRatio}">
+	<video #video class="videoPlayer" vtype="webrtc" autoplay controls muted playsinline></video>
+</div>
