@@ -1,9 +1,16 @@
 /* You can add global styles to this file, and also import other style files */
 
+@import "normalize.css";
+
 body {
 	margin: 0;
 }
 
 html {
 	background-color: slategrey;
+
+	// I'm getting a tiny bit of overflow on Firefox for some mysterious reason.
+	// Let's just clip it until I can figure out what's going on.
+	// TODO: figure out a proper solution
+	overflow: clip;
 }

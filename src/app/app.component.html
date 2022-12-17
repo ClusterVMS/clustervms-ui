@@ -1,12 +1,11 @@
 <div class="content" role="main">
 
 <header>
-	<h1>ClusterVMS</h1>
 </header>
 
 <main>
 
-	<div id="video-grid" class="video-grid">
+	<div id="video-grid" #videoGrid class="video-grid" [ngStyle]="{'--columns': videoColumns}">
 		<app-video-player *ngFor="let camera of cameras" [cameraId]="camera.id"></app-video-player>
 	</div>
 
@@ -15,3 +14,5 @@
 
 <footer>
 </footer>
+
+</div>

@@ -1,0 +1,5 @@
+ClusterVMS UI
+Copyright 2022 Alicrow
+
+This project includes software from normalize.css,
+under the MIT license.
