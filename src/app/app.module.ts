@@ -4,11 +4,13 @@ import { NgModule } from '@angular/core';
 
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
+import { VideoGridComponent } from './video-grid/video-grid.component';
 import { VideoPlayerComponent } from './video-player/video-player.component';
 
 @NgModule({
 	declarations: [
 		AppComponent,
+		VideoGridComponent,
 		VideoPlayerComponent,
 	],
 	imports: [

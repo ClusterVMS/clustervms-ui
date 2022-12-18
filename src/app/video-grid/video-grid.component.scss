@@ -1,0 +1,14 @@
+
+
+
+:host {
+	display: flex;
+	flex-direction: column;
+	min-height: 0;  // Allow to be shrinked
+}
+
+.video-grid {
+	display: grid;
+	grid-template-columns: repeat(var(--columns), 1fr);
+	max-height: 100%;
+}

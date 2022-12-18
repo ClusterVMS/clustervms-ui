@@ -1,0 +1,3 @@
+<div #videoGrid class="video-grid" [ngStyle]="{'--columns': videoColumns}">
+	<app-video-player *ngFor="let camera of cameras" [cameraId]="camera.id"></app-video-player>
+</div>

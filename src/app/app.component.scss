@@ -21,9 +21,3 @@ main {
 	display: flex;
 	flex-direction: column;
 }
-
-.video-grid {
-	display: grid;
-	grid-template-columns: repeat(var(--columns), 1fr);
-	max-height: 100%;
-}
