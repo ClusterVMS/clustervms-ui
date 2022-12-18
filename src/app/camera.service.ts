@@ -16,6 +16,12 @@ export class CameraService {
 	constructor(private http: HttpClient) {}
 
 	getCamera(id: CameraId): Observable<Camera> {
+		if(id === "") {
+			console.warn("Empty string handed to getCamera()");
+			return new Observable(observer => {
+				observer.next(undefined);
+			});
+		}
 		return this.http.get<Camera>("http://clustervms.localdomain/v0/cameras/"+id)
 			.pipe(
 				tap(_ => console.log("fetched camera")),

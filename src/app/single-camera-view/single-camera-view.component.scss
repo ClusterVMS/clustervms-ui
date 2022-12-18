@@ -1,0 +1,11 @@
+
+
+
+:host {
+	display: flex;
+	min-height: 0;  // Allow to be shrunk
+}
+
+app-video-player {
+	flex-grow: 1;
+}

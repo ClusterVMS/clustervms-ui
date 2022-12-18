@@ -4,12 +4,14 @@ import { NgModule } from '@angular/core';
 
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
+import { SingleCameraViewComponent } from './single-camera-view/single-camera-view.component';
 import { VideoGridComponent } from './video-grid/video-grid.component';
 import { VideoPlayerComponent } from './video-player/video-player.component';
 
 @NgModule({
 	declarations: [
 		AppComponent,
+		SingleCameraViewComponent,
 		VideoGridComponent,
 		VideoPlayerComponent,
 	],
