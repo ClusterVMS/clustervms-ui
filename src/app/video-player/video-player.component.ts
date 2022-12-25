@@ -106,7 +106,12 @@ export class VideoPlayerComponent implements AfterViewInit {
 				'direction': 'recvonly'
 			});
 			this.webrtcSendChannel = this.webrtc.createDataChannel('foo');
-			this.webrtcSendChannel.onclose = (e: any) => console.log('sendChannel has closed', e);
+			this.webrtcSendChannel.onclose = (e: any) => {
+				console.log('sendChannel has closed', e);
+				// Attempt to reconnect
+				// TODO: if connection fails, should periodically re-try
+				this.playWebrtc();
+			};
 			this.webrtcSendChannel.onopen = () => {
 				console.log('sendChannel has opened');
 				this.webrtcSendChannel.send('ping');
