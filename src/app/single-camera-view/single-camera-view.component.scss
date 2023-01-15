@@ -3,7 +3,53 @@
 
 :host {
 	display: flex;
+	flex-direction: column;
 	min-height: 0;  // Allow to be shrunk
+}
+
+nav ul {
+	display: flex;
+	flex-wrap: wrap;
+	list-style-type: none;
+	margin: 0;
+	padding: 0;
+
+	li {
+		display: inline-block;
+		flex-grow: 1;
+
+		a {
+			box-sizing: border-box;
+			color: inherit;
+			display: inline-block;
+			text-decoration: none;   // No underline
+			width: 100%;
+		}
+	}
+}
+
+.tab {
+	background-color: #9daebd;
+	border-left: 1px black solid;
+	border-right: 1px black solid;
+	color: black;
+	font-size: large;
+	padding: 0.75em;
+	text-align: center;
+
+	&:hover {
+		background-color: lightblue;
+	}
+	&.active-tab {
+		background-color: #67a4e1;
+	}
+}
+
+main {
+	display: flex;
+	flex-direction: column;
+	flex-grow: 1;
+	min-height: 0;	// Allow to be shrunk
 }
 
 app-video-player {

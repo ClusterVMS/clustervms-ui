@@ -1,6 +1,8 @@
 import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
 import { Component, ElementRef, Input, AfterViewInit, ViewChild } from '@angular/core';
 
+import Hls from 'hls.js';
+
 import { Camera } from '../camera';
 import { CameraService } from '../camera.service';
 import { StreamId, StreamMap } from '../stream';
@@ -14,15 +16,16 @@ import { StreamId, StreamMap } from '../stream';
 @Component({
 	selector: 'app-video-player',
 	templateUrl: './video-player.component.html',
-	styleUrls: ['./video-player.component.scss']
+	styleUrls: ['./video-player.component.scss'],
+	host: {
+		'(window:resize)': 'onResized($event)'
+	}
 })
 export class VideoPlayerComponent implements AfterViewInit {
 
 	@Input() cameraId: string = "";
+	@Input() live: boolean = true;
 
-	webrtc: any;
-	webrtcSendChannel: any;
-	webrtcSendChannelInterval: any;
 	video: any;
 	aspectRatio = 16 / 9;
 	streamUrl: string = "";
@@ -30,26 +33,45 @@ export class VideoPlayerComponent implements AfterViewInit {
 
 	@ViewChild('video') videoDirective? : any;
 
+	hlsFirstSegmentLoaded: boolean = false;
+	hlsSegmentRetryCount: number = 0;
+
+	webrtc: any;
+	webrtcSendChannel: any;
+	webrtcSendChannelInterval: any;
+
 	constructor(private http: HttpClient, private cameraService: CameraService, private el: ElementRef) {}
 
 	ngAfterViewInit(): void {
-		if(this.cameraId === undefined) {
+		if(this.cameraId == undefined) {
 			console.log("cameraId is undefined");
 			return;
 		}
-		if(this.videoDirective === undefined) {
+		if(this.videoDirective == undefined) {
 			console.log("video element is undefined");
 			return;
 		}
 		/// FIXME: error checking
 		console.log(document.getElementsByTagName("video"));
 		console.log(this.videoDirective.nativeElement);
-		this.playWebrtc()
+		this.updatePlayer();
+	}
+
+	onResized(event: any) {
+		this.updatePlayer();
+	}
+
+	updatePlayer(): void {
+		if(this.live) {
+			this.playWebrtc();
+		} else {
+			this.playHls();
+		}
 	}
 
 	/// Determines the optimal stream to play, based on size and other characteristics
 	chooseStream(streams: StreamMap): StreamId {
-		let playerWidth = this.el.nativeElement.offsetWidth;
+		let playerWidth = this.videoDirective.nativeElement.offsetWidth;
 
 		let bestStreamId = "";
 		for(let [streamId, streamInfo] of Object.entries(streams)) {
@@ -59,15 +81,112 @@ export class VideoPlayerComponent implements AfterViewInit {
 				continue;
 			}
 
-			// Choose the stream that's closest in size to our player
-			// Not sure what formula makes the most sense. Using simple difference for now, but there might be a better formula.
-			if(Math.abs(playerWidth - streams[bestStreamId].width) > Math.abs(playerWidth - streamInfo.width)) {
+			let bestStreamScore = this.scoreStream(playerWidth, streams[bestStreamId].width);
+			let thisStreamScore = this.scoreStream(playerWidth, streamInfo.width);
+			if(thisStreamScore > bestStreamScore) {
 				bestStreamId = streamId;
 				continue;
 			}
 		}
 
 		return bestStreamId;
+	}
+
+	/// Returns a score for the suitability of the given stream
+	/// Tries to find a stream close to the size of the player, favoring too-large streams vs too-small streams
+	scoreStream(playerWidth: number, streamWidth: number): number {
+		if(playerWidth > streamWidth) {
+			// Stream is smaller than the player
+			return -1.0 * Math.abs(playerWidth - streamWidth);
+		} else {
+			// Stream is larger than the player
+			return -0.25 * Math.abs(playerWidth - streamWidth);
+		}
+	}
+
+	playHls() {
+		this.cameraService.getCamera(this.cameraId).subscribe((data: Camera) => {
+			if(data == undefined) {
+				return;
+			} else {
+				let newStreamId = this.chooseStream(data.streams);
+				if(newStreamId === this.streamId) {
+					// Current stream is still the appropriate one.
+					return;
+				}
+				this.streamId = newStreamId;
+				console.log("Chose stream " + this.streamId + " for camera " + this.cameraId);
+
+				this.streamUrl = "http://clustervms.localdomain/v0/recordings/"+this.cameraId+"/"+this.streamId+"/combined.m3u8";
+				if(this.streamUrl === "") {
+					console.error("Failed to retrieve combined recording URL for camera " + this.cameraId + " stream " + this.streamId);
+					return;
+				}
+
+				this.video = this.videoDirective.nativeElement;
+				if (Hls.isSupported()) {
+					var hls = new Hls();
+					hls.loadSource(this.streamUrl);
+					hls.attachMedia(this.video);
+
+					hls.on(Hls.Events.FRAG_LOADED, () => {
+						this.hlsFirstSegmentLoaded = true;
+						this.hlsSegmentRetryCount = 0;
+					});
+
+					hls.on(Hls.Events.ERROR, (event, data) => {
+						console.warn("HLS error: ", data);
+
+						if(data.details === Hls.ErrorDetails.FRAG_LOAD_ERROR) {
+							// A fragment couldn't load, even after retrying it a few times.
+							// Move on to another fragment
+							console.error("HLS segment ", data.frag?.relurl, " failed to load; moving on");
+
+							this.hlsSegmentRetryCount++;
+
+							// If this isn't the first time the segment failed to load, skip past it until we find a segment we can load.
+							if(this.hlsSegmentRetryCount > 1) {
+								if(data.frag) {
+									// Reload at the start of the next fragment
+									let retryPosition = data.frag.start + data.frag.duration + 0.1;
+									console.log("attempting to reload at ", retryPosition);
+									hls.stopLoad();
+									hls.startLoad(retryPosition);
+									// Set video time to the new position
+									// Without this, Hls.js will keep trying to load the same segment again even though we changed the startPosition.
+									this.video.currentTime = retryPosition;
+								} else {
+									console.error("HLS error object did not contain 'frag' field. Unable to determine position to retry at.");
+								}
+							}
+						}
+
+						if(data.fatal) {
+							switch(data.type) {
+								case Hls.ErrorTypes.NETWORK_ERROR:
+									console.warn("Fatal network error; trying to recover");
+									hls.startLoad();
+									break;
+								case Hls.ErrorTypes.MEDIA_ERROR:
+									console.warn("Fatal media error; trying to recover");
+									hls.recoverMediaError();
+									break;
+								default:
+									// Cannot recover
+									console.error("Fatal HLS error; cannot recover");
+									hls.destroy();
+									// Try re-creating from the beginning
+									this.playHls();
+									break;
+							}
+						}
+					});
+				} else if (this.video.canPlayType('application/vnd.apple.mpegurl')) {
+					// Native browser support available
+					this.video.src = this.streamUrl;
+				}
+			}
+		});
 	}
 
 	playWebrtc() {
@@ -77,10 +196,17 @@ export class VideoPlayerComponent implements AfterViewInit {
 		this.video = this.videoDirective.nativeElement;
 
 		this.cameraService.getCamera(this.cameraId).subscribe((data: Camera) => {
-			if(data === undefined) {
+			if(data == undefined) {
 				return;
 			} else {
-				this.streamId = this.chooseStream(data.streams);
+				let newStreamId = this.chooseStream(data.streams);
+				if(newStreamId === this.streamId) {
+					// Current stream is still the appropriate one.
+					return;
+				}
+				this.streamId = newStreamId;
+				console.log("Chose stream " + this.streamId + " for camera " + this.cameraId);
+
 				this.streamUrl = data.streams[this.streamId]?.recast_url ?? "";
 				if(this.streamUrl === "") {
 					console.error("Failed to retrieve URL for camera " + this.cameraId + " stream " + this.streamId);
@@ -110,6 +236,8 @@ export class VideoPlayerComponent implements AfterViewInit {
 				console.log('sendChannel has closed', e);
 				// Attempt to reconnect
 				// TODO: if connection fails, should periodically re-try
+				// Clear streamId to indicate we're no longer playing any stream.
+				this.streamId = "";
 				this.playWebrtc();
 			};
 			this.webrtcSendChannel.onopen = () => {

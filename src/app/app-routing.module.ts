@@ -6,7 +6,8 @@ import { VideoGridComponent } from './video-grid/video-grid.component';
 
 const routes: Routes = [
 	{ path: "", redirectTo: "/overview", pathMatch: "full" },
-	{ path: "cameras/:id", component: SingleCameraViewComponent },
+	{ path: "cameras/:id", redirectTo: "cameras/:id/live" },
+	{ path: "cameras/:id/:camView", component: SingleCameraViewComponent },
 	{ path: "overview", component: VideoGridComponent },
 ];
 

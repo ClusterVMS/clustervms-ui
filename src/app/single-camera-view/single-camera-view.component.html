@@ -1,5 +1,37 @@
-<div *ngIf="camera" class="display-contents">
-	<a [routerLink]="['/']" class="display-contents">
+<nav>
+	<ul>
+		<li>
+			<a
+				*ngIf="camera"
+				class="tab"
+				[routerLink]="['/cameras/'+camera.id+'/live']"
+				routerLinkActive="active-tab"
+			>
+				Live
+			</a>
+		</li>
+		<li>
+			<a
+				*ngIf="camera"
+				class="tab"
+				[routerLink]="['/cameras/'+camera.id+'/recorded']"
+				routerLinkActive="active-tab"
+			>
+				Recorded
+			</a>
+		</li>
+		<li>
+			<a class="tab" [routerLink]="['/']">
+				Overview
+			</a>
+		</li>
+	</ul>
+</nav>
+<main *ngIf="camera">
+	<div *ngIf="view === 'live'" class="display-contents">
 		<app-video-player [cameraId]="camera.id"></app-video-player>
-	</a>
-</div>
+	</div>
+	<div *ngIf="view === 'recorded'" class="display-contents">
+		<app-video-player [cameraId]="camera.id" [live]="false"></app-video-player>
+	</div>
+</main>

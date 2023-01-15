@@ -11,20 +11,23 @@ import { CameraService } from '../camera.service';
 })
 export class SingleCameraViewComponent {
 	camera?: Camera;
+	view: string = "";
 
 	constructor(
 		private cameraService: CameraService,
 		private route: ActivatedRoute
-	) {}
-
-	ngOnInit(): void {
-		this.getCamera();
-	}
-
-	getCamera(): void {
-		let cameraId = this.route.snapshot.paramMap.get("id") ?? "";
-		this.cameraService.getCamera(cameraId).subscribe((data: Camera) => {
-			this.camera = data;
+	) {
+		route.paramMap.subscribe(params => {
+			let cameraId = params.get("id") ?? "";
+			if(
+				!this.camera
+				|| this.camera.id !== cameraId
+			) {
+				this.cameraService.getCamera(cameraId).subscribe((data: Camera) => {
+					this.camera = data;
+				});
+			}
+			this.view = params.get("camView") ?? "live";
 		});
 	}
 }

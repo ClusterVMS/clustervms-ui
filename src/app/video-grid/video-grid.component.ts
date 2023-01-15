@@ -52,7 +52,7 @@ export class VideoGridComponent {
 				// This should be the ideal number of columns if filling the height of the grid
 				// If filling the width of the grid, we want one less row
 
-				if(numRows == 1) {
+				if(numRows === 1) {
 					// One row is the minimum we can do, so we'll go with that
 					this.videoColumns = numColumns;
 					return;
