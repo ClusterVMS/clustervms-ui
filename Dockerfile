@@ -1,4 +1,4 @@
-FROM node:18.12-alpine3.16
+FROM node:18.12-alpine3.16 as builder
 WORKDIR /app/
 COPY ./package.json /app/
 COPY ./package-lock.json /app/
@@ -7,14 +7,9 @@ RUN npm install
 COPY . /app/
 
 RUN ln -s /app/node_modules/@angular/cli/bin/ng.js /usr/bin/ng
+RUN ng build
 
-# TODO: multi-stage build
-# TODO: only install necessary dependencies
-# TODO: speed up builds by installing some dependencies before copying whole working dir
-# TODO: run as unprivileged user
 
-# TODO: use a proper web server meant for production
-# TODO: reduce image size. Currently 701MB
-CMD ["ng", "serve", "--host", "0.0.0.0"]
-
-# FIXME: should build when image is made, not during runtime
+FROM nginx:1.23.3-alpine as runtime
+COPY nginx.conf /etc/nginx/nginx.conf
+COPY --from=builder /app/dist/clustervms-ui /usr/share/nginx/html/
