@@ -5,7 +5,8 @@ import { Observable, of } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
 
 import { Camera, CameraId } from './camera';
-
+import { Recording } from './recording';
+import { StreamId } from './stream';
 
 
 @Injectable({
@@ -34,6 +35,20 @@ export class CameraService {
 			.pipe(
 				tap(_ => console.log("fetched cameras")),
 				catchError(this.handleError<Camera[]>('getCameras', []))
+			);
+	}
+
+	getRecordings(cameraId: CameraId, streamId: StreamId): Observable<Recording[]> {
+		if(cameraId === "") {
+			console.warn("Empty string handed to getRecordings()");
+			return new Observable(observer => {
+				observer.next(undefined);
+			});
+		}
+		return this.http.get<Recording[]>("http://clustervms.localdomain/v0/recordings/?camera="+cameraId+"&stream="+streamId)
+			.pipe(
+				tap(_ => console.log("fetched recordings")),
+				catchError(this.handleError<Recording[]>('getRecordings', []))
 			);
 	}
 

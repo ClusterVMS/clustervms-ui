@@ -5,6 +5,7 @@ import Hls from 'hls.js';
 
 import { Camera } from '../camera';
 import { CameraService } from '../camera.service';
+import { Recording } from '../recording';
 import { StreamId, StreamMap } from '../stream';
 
 
@@ -65,7 +66,7 @@ export class VideoPlayerComponent implements AfterViewInit {
 		if(this.live) {
 			this.playWebrtc();
 		} else {
-			this.playHls();
+			this.playRecordingUrl();
 		}
 	}
 
@@ -104,6 +105,38 @@ export class VideoPlayerComponent implements AfterViewInit {
 		}
 	}
 
+	playRecordingUrl() {
+		this.cameraService.getCamera(this.cameraId).subscribe((data: Camera) => {
+			if(data == undefined) {
+				return;
+			} else {
+				let newStreamId = this.chooseStream(data.streams);
+				if(newStreamId === this.streamId) {
+					// Current stream is still the appropriate one.
+					return;
+				}
+				this.streamId = newStreamId;
+				console.log("Chose stream " + this.streamId + " for camera " + this.cameraId);
+
+				this.cameraService.getRecordings(this.cameraId, this.streamId).subscribe((recordings: Recording[]) => {
+					if(recordings.length == 0) {
+						console.error("No recordings found for camera " + this.cameraId + " stream " + this.streamId);
+						return;
+					}
+					this.streamUrl = recordings[0].url;
+					if(this.streamUrl === "") {
+						console.error("Failed to retrieve recording URL for camera " + this.cameraId + " stream " + this.streamId);
+						return;
+					}
+
+					this.video = this.videoDirective.nativeElement;
+					this.video.src = this.streamUrl;
+				});
+			}
+		});
+	}
+
+	/// Deprecated; no longer using HLS, but keeping this here for now in case we bring it back.
 	playHls() {
 		this.cameraService.getCamera(this.cameraId).subscribe((data: Camera) => {
 			if(data == undefined) {
