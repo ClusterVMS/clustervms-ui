@@ -23,7 +23,7 @@ export class CameraService {
 				observer.next(undefined);
 			});
 		}
-		return this.http.get<Camera>("http://clustervms.localdomain/v0/cameras/"+id)
+		return this.http.get<Camera>("/v0/cameras/"+id)
 			.pipe(
 				tap(_ => console.log("fetched camera")),
 				catchError(this.handleError<Camera>('getCamera', undefined))
@@ -31,7 +31,7 @@ export class CameraService {
 	}
 
 	getCameras(): Observable<Camera[]> {
-		return this.http.get<Camera[]>("http://clustervms.localdomain/v0/cameras/")
+		return this.http.get<Camera[]>("/v0/cameras/")
 			.pipe(
 				tap(_ => console.log("fetched cameras")),
 				catchError(this.handleError<Camera[]>('getCameras', []))
@@ -45,7 +45,7 @@ export class CameraService {
 				observer.next(undefined);
 			});
 		}
-		return this.http.get<Recording[]>("http://clustervms.localdomain/v0/recordings/?camera="+cameraId+"&stream="+streamId)
+		return this.http.get<Recording[]>("/v0/recordings/?camera="+cameraId+"&stream="+streamId)
 			.pipe(
 				tap(_ => console.log("fetched recordings")),
 				catchError(this.handleError<Recording[]>('getRecordings', []))
