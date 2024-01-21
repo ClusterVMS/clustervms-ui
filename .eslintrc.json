@@ -35,7 +35,10 @@
 						"style": "kebab-case"
 					}
 				],
-				"indent": ["error", "tab"]
+				"indent": [
+					"error",
+					"tab"
+				]
 			}
 		},
 		{
