@@ -1,3 +1,3 @@
 #!/bin/sh
 
-docker build -t clustervms-ui .
+docker build -t alicrow/clustervms-ui .
