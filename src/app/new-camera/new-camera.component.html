@@ -1,0 +1,45 @@
+<h1>New Camera</h1>
+
+<form [formGroup]="cameraForm" (ngSubmit)="onSubmit()">
+	<label for="name">Name: </label>
+	<input id="name" type="text" formControlName="name"/>
+
+	<label for="onvif_url">Address: </label>
+	<input id="onvif_url" type="url" formControlName="onvif_url" required/>
+
+	<label for="username">Username: </label>
+	<input id="username" type="text" formControlName="username"/>
+
+	<label for="password">Password: </label>
+	<input id="password" type="password" formControlName="password"/>
+
+	<div formArrayName="streams" class="formgroup">
+		<h2 class="span-columns">Streams</h2>
+
+		<table>
+			<thead>
+				<th>Name</th>
+				<th>Url</th>
+			</thead>
+			<tbody>
+				<tr *ngFor="let stream of streams.controls; let i=index" [formGroupName]="i">
+					<td>
+						<input id="stream-{{i}}-id" type="text" formControlName="id" placeholder="Name" size="10"/>
+					</td>
+
+					<td>
+						<input id="stream-{{i}}-url" type="url" formControlName="source_url" placeholder="rtsp://1.2.3.4/stream" required/>
+					</td>
+
+					<td>
+						<button type="button" (click)="removeStream(i)">-</button>
+					</td>
+				</tr>
+
+				<button class="span-columns" type="button" (click)="addStream()">+</button>
+			</tbody>
+		</table>
+	</div>
+
+	<button type="submit" [disabled]="!cameraForm.valid">Submit</button>
+</form>

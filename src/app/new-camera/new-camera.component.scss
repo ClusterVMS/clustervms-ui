@@ -1,0 +1,39 @@
+:host {
+	overflow: scroll;
+	padding: 1em;
+}
+
+
+label {
+	display: block;
+	margin-left: 0.5em;
+	margin-right: 1em;
+	align-self: center; // center vertically
+}
+
+h2 {
+	margin: 0.5em 0;
+}
+
+form, .formgroup {
+	display: grid;
+	grid-template-columns: repeat(3, minmax(min-content, max-content));
+
+	label {
+		grid-column: 1;
+	}
+}
+form .formgroup {
+	grid-column: 1 / -1; // span all columns
+	margin: 1em 0;
+}
+
+.span-columns {
+	grid-column: 1 / -1; // span all columns
+}
+
+
+input {
+	width: 100%; // allow element to resize
+	box-sizing: border-box;
+}

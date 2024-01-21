@@ -1,6 +1,20 @@
 <div class="content" role="main">
 
 <header>
+	<nav>
+		<ul>
+			<li>
+				<a class="tab" [routerLink]="['/overview']" routerLinkActive="active-tab">
+					Overview
+				</a>
+			</li>
+			<li>
+				<a class="tab" [routerLink]="['/new-camera']" routerLinkActive="active-tab">
+					Add camera
+				</a>
+			</li>
+		</ul>
+	</nav>
 </header>
 
 <main>

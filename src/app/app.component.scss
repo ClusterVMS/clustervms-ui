@@ -1,13 +1,45 @@
 
 
 
-// FIXME: find a better way to do this
-* {
-	width: 100%;
-}
-
 :host {
 	display: block;
+}
+
+nav ul {
+	display: flex;
+	flex-wrap: wrap;
+	list-style-type: none;
+	margin: 0;
+	padding: 0;
+
+	li {
+		display: contents;
+
+		a {
+			box-sizing: border-box;
+			color: inherit;
+			display: inline-block;
+			text-decoration: none;   // No underline
+			flex-grow: 1;
+			width: 0;
+		}
+	}
+}
+
+.tab {
+	background-color: #9daebd;
+	border: 1px black solid;
+	color: black;
+	font-size: large;
+	padding: 0.75em;
+	text-align: center;
+
+	&:hover {
+		background-color: lightblue;
+	}
+	&.active-tab {
+		background-color: #67a4e1;
+	}
 }
 
 main {

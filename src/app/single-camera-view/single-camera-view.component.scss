@@ -15,23 +15,22 @@ nav ul {
 	padding: 0;
 
 	li {
-		display: inline-block;
-		flex-grow: 1;
+		display: contents;
 
 		a {
 			box-sizing: border-box;
 			color: inherit;
 			display: inline-block;
 			text-decoration: none;   // No underline
-			width: 100%;
+			flex-grow: 1;
+			width: 0;
 		}
 	}
 }
 
 .tab {
 	background-color: #9daebd;
-	border-left: 1px black solid;
-	border-right: 1px black solid;
+	border: 1px black solid;
 	color: black;
 	font-size: large;
 	padding: 0.75em;

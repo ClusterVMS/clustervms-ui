@@ -38,6 +38,14 @@ export class CameraService {
 			);
 	}
 
+	addCamera(data: Camera): Observable<Camera> {
+		return this.http.post<Camera>("/v0/cameras/", data)
+			.pipe(
+				tap(_ => console.log("created new camera")),
+				catchError(this.handleError<Camera>('addCamera', undefined))
+			);
+	}
+
 	getRecordings(cameraId: CameraId, streamId: StreamId): Observable<Recording[]> {
 		if(cameraId === "") {
 			console.warn("Empty string handed to getRecordings()");
