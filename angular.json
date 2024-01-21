@@ -85,10 +85,10 @@
 					"builder": "@angular-devkit/build-angular:dev-server",
 					"configurations": {
 						"production": {
-							"browserTarget": "clustervms-ui:build:production"
+							"buildTarget": "clustervms-ui:build:production"
 						},
 						"development": {
-							"browserTarget": "clustervms-ui:build:development"
+							"buildTarget": "clustervms-ui:build:development"
 						}
 					},
 					"defaultConfiguration": "development"
@@ -96,7 +96,7 @@
 				"extract-i18n": {
 					"builder": "@angular-devkit/build-angular:extract-i18n",
 					"options": {
-						"browserTarget": "clustervms-ui:build"
+						"buildTarget": "clustervms-ui:build"
 					}
 				},
 				"lint": {
