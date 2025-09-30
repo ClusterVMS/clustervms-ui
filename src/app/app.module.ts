@@ -1,5 +1,5 @@
 import { BrowserModule } from '@angular/platform-browser';
-import { HttpClientModule } from '@angular/common/http';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
@@ -22,10 +22,11 @@ import { VideoPlayerComponent } from './video-player/video-player.component';
 		AppRoutingModule,
 		BrowserModule,
 		FormsModule,
-		HttpClientModule,
 		ReactiveFormsModule,
 	],
-	providers: [],
+	providers: [
+		provideHttpClient(withInterceptorsFromDi()),
+	],
 	bootstrap: [AppComponent]
 })
 export class AppModule { }

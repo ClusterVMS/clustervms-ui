@@ -12,4 +12,4 @@ RUN ng build
 
 FROM nginx:1.23.3-alpine as runtime
 COPY nginx.conf /etc/nginx/nginx.conf
-COPY --from=builder /app/dist/clustervms-ui /usr/share/nginx/html/
+COPY --from=builder /app/dist/clustervms-ui/browser /usr/share/nginx/html/
