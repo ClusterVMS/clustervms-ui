@@ -20,7 +20,8 @@ import { StreamId, StreamMap } from '../stream';
 	styleUrls: ['./video-player.component.scss'],
 	host: {
 		'(window:resize)': 'onResized($event)'
-	}
+	},
+	standalone: false,
 })
 export class VideoPlayerComponent implements AfterViewInit {
 

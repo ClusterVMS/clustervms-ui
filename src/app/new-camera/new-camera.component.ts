@@ -9,7 +9,8 @@ import { Stream, StreamMap } from '../stream';
 @Component({
 	selector: 'app-new-camera',
 	templateUrl: './new-camera.component.html',
-	styleUrls: ['./new-camera.component.scss']
+	styleUrls: ['./new-camera.component.scss'],
+	standalone: false,
 })
 export class NewCameraComponent {
 	cameraForm = this.fb.group({

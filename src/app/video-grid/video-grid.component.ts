@@ -9,7 +9,8 @@ import { CameraService } from '../camera.service';
 	styleUrls: ['./video-grid.component.scss'],
 	host: {
 		'(window:resize)': 'onResized($event)'
-	}
+	},
+	standalone: false,
 })
 export class VideoGridComponent {
 	cameras: Camera[] = [];

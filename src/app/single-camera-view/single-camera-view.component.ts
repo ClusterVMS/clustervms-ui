@@ -7,7 +7,8 @@ import { CameraService } from '../camera.service';
 @Component({
 	selector: 'app-single-camera-view',
 	templateUrl: './single-camera-view.component.html',
-	styleUrls: ['./single-camera-view.component.scss']
+	styleUrls: ['./single-camera-view.component.scss'],
+	standalone: false,
 })
 export class SingleCameraViewComponent {
 	camera?: Camera;
